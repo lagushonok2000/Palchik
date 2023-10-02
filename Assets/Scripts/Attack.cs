@@ -1,29 +1,24 @@
 using System.Collections;
 using UnityEngine;
 
-public class Attack : Hold
+public class Attack : MonoBehaviour
 {
-    public float RandomNumber = Random.Range(1, 7);
-    public bool Hold = true;
-    public Animator CheekAnimation;
-    public Animator TeethAnimation;
+    [SerializeField] private Hold _hold;
+    [SerializeField] private float _maxSecondsToAttack;
+    [SerializeField] private Animator _animation;
 
-    public void Update()
-    {
-        StartCoroutine(SecondsToAttack());
-    }
-    
     public IEnumerator SecondsToAttack()
     {
-        while (Hold)  // onPointerDown
-        {
-            yield return new WaitForSeconds (RandomNumber);
-            Debug.Log("схлопывается"); //срабатывает метод OnPointerUp()
-            CheekAnimation = GetComponent<Animator>();
-            TeethAnimation = GetComponent<Animator>();
-            CheekAnimation.enabled = true;
-            TeethAnimation.enabled = true;
+        yield return new WaitForSeconds(Random.Range(1, _maxSecondsToAttack));
+        _animation.SetTrigger("start");
+    }
 
+    public void Close()
+    {
+        if (_hold.Active)
+        {
+            _hold.ResetAll();
+            Handheld.Vibrate();
         }
     }
 }

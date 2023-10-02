@@ -6,36 +6,37 @@ using UnityEngine.EventSystems;
 
 public class Hold : MonoBehaviour, IPointerExitHandler, IPointerUpHandler, IPointerDownHandler
 {
+    [SerializeField] Attack _attack;
     [SerializeField] private TMP_Text _textPointsCounter;
     [SerializeField] private TMP_Text _textTotalPointsCounter;
-    [SerializeField] private float _updatePerSeconds;
-    [SerializeField] private int _maxAdd;
-    [SerializeField] private int _countAdd;
-    private float _points = 0;
-    private bool _active;
-    
+    [SerializeField] private float _startUpdatePerSeconds;
+    [SerializeField] private float _subUpdatePerSeconds;
+    [SerializeField] private float _minUpdatePerSeconds;
+    private float _updatePerSeconds;
+    public float _points = 0;
+    public float TotalPoints = 0;
+    public bool Active;
     
     IEnumerator PointsCounter()
     {
-        float add = _countAdd;
-        while (_active)
+        _updatePerSeconds = _startUpdatePerSeconds;
+        while (Active)
         {
-            _points = _points + 1;
+            _points++;
             _textPointsCounter.text = _points.ToString("#");
             yield return new WaitForSeconds(_updatePerSeconds);
-            _updatePerSeconds -= 0.001f;
-            
-            if (add < _maxAdd)
+            if (_updatePerSeconds > _minUpdatePerSeconds)
             {
-                add += _countAdd;
+                _updatePerSeconds -= _subUpdatePerSeconds;
             }
         }
     }
 
     public void OnPointerDown(PointerEventData eventData)
     {
-        _active = true;
+        Active = true;
         StartCoroutine(PointsCounter());
+        StartCoroutine(_attack.SecondsToAttack());
     }
   
     public void OnPointerExit(PointerEventData eventData)
@@ -50,10 +51,18 @@ public class Hold : MonoBehaviour, IPointerExitHandler, IPointerUpHandler, IPoin
 
     private void PointerUp()
     {
-        _active = false;
-        _textTotalPointsCounter.text = (Convert.ToSingle(_textTotalPointsCounter.text) + _points).ToString();
+        Active = false;
+        TotalPoints += _points;
+        _textTotalPointsCounter.text = TotalPoints.ToString("#");
         _textPointsCounter.text = "0";
         _points = 0;
         StopAllCoroutines();
+    }
+
+    public void ResetAll()
+    {
+        _points = 0;
+        _textPointsCounter.text = "0";
+        _textTotalPointsCounter.text = "0";
     }
 }
