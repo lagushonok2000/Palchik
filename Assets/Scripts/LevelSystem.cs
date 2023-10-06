@@ -1,67 +1,46 @@
-using System;
-using System.Collections;
-using System.Collections.Generic;
-using TMPro;
 using UnityEngine;
 
 public class LevelSystem : MonoBehaviour
 {
     [SerializeField] private Hold _hold;
-    [SerializeField] private TMP_Text _textTotalPointsCounter;
-    [SerializeField] private GameObject _hat;
-    [SerializeField] private GameObject _bowTie;
-    [SerializeField] private GameObject _glasses;
-    [SerializeField] private GameObject _stick;
+    [SerializeField] private LevelPositiitions _changeLevelsPositions;
+    [SerializeField] public int[] Levels = { };
+    [SerializeField] private GameObject[] _accessories;
     [SerializeField] private GameObject _endFace;
     [SerializeField] private GameObject _monsterFace;
-    [SerializeField] int[] Levels = { };
+    
 
-    private void Update()
+    public void LevelChek(float TotalPoints)
     {
-        Hat();
-        BowTie();
-        Glasses();
-        Stick();
-        EndGame();
-    }
-    public void Hat()
-    {
-        if (_hold.TotalPoints >= Levels[0])
+        for (int i = 0; i < Levels.Length; i++)
         {
-          _hat.SetActive(true);
+            if (TotalPoints >= Levels[i])
+            {
+                _accessories[i].SetActive(true);
+                _changeLevelsPositions.ChangeLevelsPositions(i);
+
+                if (i == 4)
+                {
+                    _monsterFace.SetActive(false);
+                    _endFace.SetActive(true);
+                }
+                
+            }
         }
     }
-
-    public void BowTie()
+    
+    private void GameOver()
     {
-        if (_hold.TotalPoints >= Levels[1])
+        if (_hold.TotalPoints == 0)
         {
-            _bowTie.SetActive(true);
-        }
-    }
+            _endFace.SetActive(false);
+            _monsterFace.SetActive(true);
+            for (int i = 0;i < _accessories.Length;i++)
+            {
+                _accessories[i].SetActive(false);
+            }
 
-    public void Glasses()
-    {
-        if (_hold.TotalPoints >= Levels[2])
-        {
-           _glasses.SetActive(true);
-        }
-    }
-
-    public void Stick()
-    {
-        if (_hold.TotalPoints >= Levels[3])
-        {
-            _stick.SetActive(true);
-        }
-    }
-
-    public void EndGame()
-    {
-        if (_hold.TotalPoints >= Levels[4])
-        {
-            _endFace.SetActive(true);
-            _monsterFace.SetActive(false);
+            _changeLevelsPositions.ChangeLevelsPositions(0);
         }
     }
 }
